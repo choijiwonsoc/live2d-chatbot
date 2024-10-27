@@ -2,13 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import * as PIXI from "pixi.js";
 import { Live2DModel } from "pixi-live2d-display";
+import Typewriter from "./Typewriter";
 
 const ChatbotWithLive2D = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [textInput, setTextInput] = useState("");
+  const [modelResponse, setModelResponse] = useState(""); // State untuk subtitle
+  const [isLoading, setIsLoading] = useState(false); // State untuk loading
   const chatContainerRef = useRef(null);
   const modelRef = useRef(null);
-
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -16,7 +18,6 @@ const ChatbotWithLive2D = () => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then((stream) => {
-        // Menghubungkan stream ke elemen video
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -94,6 +95,12 @@ const ChatbotWithLive2D = () => {
 
     audio.play();
     animateLipSync();
+
+    // Hapus subtitle setelah audio selesai
+    audio.onended = () => {
+      setTimeout(() => setModelResponse(""), 3000);
+      setIsLoading(false);
+    };
   };
 
   // Send message to API and handle response
@@ -101,6 +108,8 @@ const ChatbotWithLive2D = () => {
     if (!message.trim()) return;
 
     setChatHistory((prev) => [...prev, { sender: "user", message }]);
+    setIsLoading(true); // Set loading saat mulai meminta respons
+
     try {
       const { data } = await axios.post("http://127.0.0.1:8000/generate", {
         text: message,
@@ -114,15 +123,24 @@ const ChatbotWithLive2D = () => {
         { sender: "bot", message: botResponse },
       ]);
 
+      // Set modelResponse untuk subtitle
+      setModelResponse(botResponse);
+      setIsLoading(false); // Matikan loading setelah respons diterima
+
       // Play audio with lip-sync if available
       if (audioData) {
         playAudioWithLipSync(audioData);
+      } else {
+        setTimeout(() => setModelResponse(""), 3000); // Hapus setelah beberapa detik jika tidak ada audio
       }
     } catch {
       setChatHistory((prev) => [
         ...prev,
         { sender: "bot", message: "Maaf, terjadi kesalahan." },
       ]);
+      setModelResponse("Maaf, terjadi kesalahan.");
+      setIsLoading(false); // Matikan loading pada error
+      setTimeout(() => setModelResponse(""), 5000);
     }
   };
 
@@ -142,6 +160,25 @@ const ChatbotWithLive2D = () => {
               id="canvas"
               className="w-[90%] translate-y-4 translate-x-20"
             ></canvas>
+
+            {/* Subtitle dengan loading dan efek mengetik */}
+            {isLoading ? (
+              <div className="absolute bottom-3 w-fit py-2 bg-white shadow text-indigo-400 px-3 rounded-xl text-sm mx-auto text-start">
+                <div className="flex items-center space-x-1 h-4">
+                  <span className="sr-only">Loading...</span>
+                  <div className="h-1.5 w-1.5 bg-bengkod rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="h-1.5 w-1.5 bg-bengkod rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="h-1.5 w-1.5 bg-bengkod rounded-full animate-bounce"></div>
+                </div>
+              </div>
+            ) : (
+              modelResponse && (
+                <div className="absolute bottom-3 w-fit py-2 bg-white shadow text-bengkod px-3 rounded-xl text-sm mx-auto text-start rounded-tl-none">
+                  {/* {modelResponse} */}
+                  <Typewriter text={modelResponse} />
+                </div>
+              )
+            )}
           </div>
 
           {/* input message */}
@@ -182,7 +219,7 @@ const ChatbotWithLive2D = () => {
         {/* Sidebar (Webcam and Chat Section) */}
         <div className="flex flex-col w-1/3 h-full ml-4">
           <div className="bg-indigo-200 rounded-xl h-1/3 p-2 relative">
-            <div className="absolute top-2 left-2 text-white  text-sm">
+            <div className="absolute top-2 left-2 text-white text-sm">
               webcam
             </div>
 
@@ -202,13 +239,16 @@ const ChatbotWithLive2D = () => {
               chat
             </span>
 
-            <div className="bg-indigo-100 w-full h-[91%] rounded-xl mt-6 p-2">
+            <div
+              className="bg-indigo-100 w-full h-[91%] rounded-xl mt-6 p-2 overflow-y-auto no-scrollbar"
+              ref={chatContainerRef}
+            >
               {chatHistory
                 .filter((chat) => chat.sender === "user")
                 .map((chat, index) => (
                   <div
                     key={index}
-                    className="text-sm text-indigo-300 bg-white p-2 px-3 rounded-2xl w-fit mb-2 rounded-br-none ml-auto"
+                    className="text-sm text-bengkod bg-white p-2 px-3 rounded-2xl w-fit mb-2 rounded-br-none ml-auto"
                   >
                     {chat.message}
                   </div>
