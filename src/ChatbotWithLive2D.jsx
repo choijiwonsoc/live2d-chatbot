@@ -3,6 +3,7 @@ import axios from "axios";
 import * as PIXI from "pixi.js";
 import { Live2DModel } from "pixi-live2d-display";
 import Typewriter from "./Typewriter";
+import FaceDetection from "./FaceDetection";
 
 const ChatbotWithLive2D = () => {
   const [chatHistory, setChatHistory] = useState([]);
@@ -218,7 +219,7 @@ const ChatbotWithLive2D = () => {
 
         {/* Sidebar (Webcam and Chat Section) */}
         <div className="flex flex-col w-1/3 h-full ml-4">
-          <div className="bg-indigo-200 rounded-xl h-1/3 p-2 relative">
+          {/* <div className="bg-indigo-200 rounded-xl h-1/3 p-2 relative">
             <div className="absolute top-2 left-2 text-white text-sm">
               webcam
             </div>
@@ -231,7 +232,8 @@ const ChatbotWithLive2D = () => {
                 className="w-full h-full object-cover rounded-xl transform scale-x-[-1]"
               />
             </div>
-          </div>
+          </div> */}
+          <FaceDetection />
 
           {/* Chat */}
           <div className="bg-indigo-200 h-2/3 rounded-xl mt-4 p-2 relative">
