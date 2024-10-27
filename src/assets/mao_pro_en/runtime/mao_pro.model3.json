@@ -44,37 +44,16 @@
 		],
 		"Motions": {
 			"Idle": [
-				{
-					"File": "motions/mtn_03.motion1.json"
-				}
+			  {
+				"File": "motions/mtn_01.motion3.json"
+			  }
 			],
 			"Tap@Body": [
-				{
-					"File": "motions/special_03.motion3.json"
-				}
-			],
-
-			"": [
-				{
-					"File": "motions/mtn_02.motion3.json"
-				},
-				{
-					"File": "motions/mtn_03.motion3.json"
-				},
-				{
-					"File": "motions/mtn_04.motion3.json"
-				},
-				{
-					"File": "motions/special_01.motion3.json"
-				},
-				{
-					"File": "motions/special_02.motion3.json"
-				},
-				{
-					"File": "motions/special_03.motion3.json"
-				}
+			  {
+				"File": "motions/special_01.motion3.json"
+			  }
 			]
-		}
+		  }
 	},
 	"Groups": [
 		{
