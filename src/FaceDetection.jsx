@@ -5,9 +5,9 @@ const FaceDetection = () => {
   const [detections, setDetections] = useState([]);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const audioPlayedRef = useRef(false); // Tambahkan ref untuk melacak pemutaran audio
 
   useEffect(() => {
-    // Mengakses webcam saat komponen dimuat
     const getVideo = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -22,13 +22,12 @@ const FaceDetection = () => {
     };
     getVideo();
 
-    // Interval untuk mengambil gambar dari webcam setiap 1 detik
     const intervalId = setInterval(() => {
       captureImage();
     }, 1000);
 
     return () => {
-      clearInterval(intervalId); // Bersihkan interval saat komponen di-unmount
+      clearInterval(intervalId);
     };
   }, []);
 
@@ -41,10 +40,8 @@ const FaceDetection = () => {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
 
-      // Menggambar frame video ke dalam canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Mengonversi canvas menjadi Blob dan mengirim ke API
       canvas.toBlob(async (blob) => {
         if (blob) {
           const formData = new FormData();
@@ -61,13 +58,29 @@ const FaceDetection = () => {
               }
             );
 
-            // Memeriksa respons dan mengambil data deteksi
             if (
               response.data &&
               response.data.data &&
               response.data.data.results
             ) {
               setDetections(response.data.data.results);
+
+              const detectedName = response.data.data.results[0]?.name;
+
+              // Periksa apakah audio belum pernah diputar dan audio tersedia
+              if (
+                detectedName &&
+                !audioPlayedRef.current &&
+                response.data.data.audio
+              ) {
+                const audio = new Audio(
+                  `data:audio/wav;base64,${response.data.data.audio}`
+                );
+                audio.play();
+
+                // Tandai bahwa audio telah diputar
+                audioPlayedRef.current = true;
+              }
             }
           } catch (error) {
             console.error(
@@ -82,29 +95,21 @@ const FaceDetection = () => {
 
   return (
     <div className="bg-indigo-200 rounded-xl h-1/3 p-2 relative">
-      {/* Tampilkan "webcam" jika tidak ada deteksi atau nama pertama yang terdeteksi */}
       <div className="absolute top-2 left-2 text-white text-sm">
         {detections.length > 0 ? detections[0].name : "webcam"}
       </div>
 
       <div className="bg-indigo-100 w-full h-5/6 rounded-xl mt-6">
         <div className="relative w-full h-full">
-          {/* Video element untuk menampilkan stream dari webcam */}
           <video
             ref={videoRef}
             autoPlay
             muted
             className="absolute w-full h-full object-cover rounded-xl"
           />
-
-          {/* Canvas untuk menangkap frame dari video */}
           <canvas ref={canvasRef} style={{ display: "none" }} />
-
-          {/* Menampilkan hasil deteksi wajah */}
           {detections.map((det, index) => {
             const [x1, y1, x2, y2] = det.bounding_box;
-
-            // Menghitung skala bounding box
             const scaleX = videoRef.current
               ? videoRef.current.clientWidth / videoRef.current.videoWidth
               : 1;
