@@ -3,3 +3,47 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
+.mic-container {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wave-animation {
+  position: absolute;
+  width: 30px; /* Ukuran lebih kecil */
+  height: 30px; /* Ukuran lebih kecil */
+  border: 2px solid #03026b; /* Warna gelombang */
+  border-radius: 50%;
+  animation: waveEffect 1.5s infinite ease-out;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+@keyframes waveEffect {
+  0% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
