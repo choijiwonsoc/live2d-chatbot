@@ -16,9 +16,9 @@ const ChatbotWithLive2D = () => {
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState("");
 
-  const [detections, setDetections] = useState([]);
   const [hasDetected, setHasDetected] = useState(false);
-  const firstDetection = useRef(false);
+  const [detections, setDetections] = useState([]);
+  const detectedNames = useRef(new Set());
   const chatContainerRef = useRef(null);
   const modelRef = useRef(null);
   const videoRef = useRef(null);
@@ -45,7 +45,7 @@ const ChatbotWithLive2D = () => {
       if (!hasDetected) {
         captureImage();
       }
-    }, 200);
+    }, 100);
 
     return () => {
       clearInterval(intervalId);
@@ -89,11 +89,23 @@ const ChatbotWithLive2D = () => {
               setHasDetected(true);
               setDetections(response.data.data.results);
 
-              if (!firstDetection.current) {
+              const detectedName = response.data.data.results[0]?.name;
+
+              // Jika nama baru belum ada dalam detectedNames, proses deteksi
+              if (detectedName && !detectedNames.current.has(detectedName)) {
+                detectedNames.current.add(detectedName);
+                setHasDetected(true);
+                setDetections(response.data.data.results);
+
                 const responseGreetings = response.data.data.response;
-                console.log(responseGreetings);
-                generateGreetings(responseGreetings);
-                firstDetection.current = true;
+                if (detectedName === "Unknown") {
+                  setModelResponse("Hai, siapa namamu?");
+                  generateGreetings("Hai, siapa namamu?");
+                } else {
+                  generateGreetings(responseGreetings);
+                }
+
+                console.log(detectedNames);
               }
             }
           } catch (error) {
@@ -119,6 +131,7 @@ const ChatbotWithLive2D = () => {
 
       if (response.data && response.data.data && response.data.data.audio) {
         const audioBase64 = response.data.data.audio;
+        setModelResponse(responseGreetings);
         playAudioWithLipSync(audioBase64);
         console.log("Greetings audio generated");
       } else {
@@ -227,6 +240,7 @@ const ChatbotWithLive2D = () => {
       setModelResponse("");
       setIsLoading(false);
       setIsAudioPlaying(false);
+      setHasDetected(false);
     };
   };
 
