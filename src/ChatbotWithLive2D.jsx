@@ -20,6 +20,8 @@ const ChatbotWithLive2D = () => {
   const [detections, setDetections] = useState([]);
   const detectedNames = useRef(new Set());
   const chatContainerRef = useRef(null);
+  const [isGreetings, setIsGreetings] = useState(false);
+  const firstDetection = useRef(null);
   const modelRef = useRef(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -92,19 +94,21 @@ const ChatbotWithLive2D = () => {
               const detectedName = response.data.data.results[0]?.name;
 
               // Jika nama baru belum ada dalam detectedNames, proses deteksi
-              if (detectedName && !detectedNames.current.has(detectedName)) {
-                detectedNames.current.add(detectedName);
-                setHasDetected(true);
-                setDetections(response.data.data.results);
+              if (detectedName && detectedName !== firstDetection.current) {
+                detectedNames.current.add(detectedName); // add nama nama ke set
+                detectedNames.current.clear(); // Kosongkan set sebelum menambah nama baru
+                detectedNames.current.add(detectedName); // Tambahkan nama terbaru ke set
+                firstDetection.current = detectedName; // Simpan nama deteksi terbaru
 
                 const responseGreetings = response.data.data.response;
+                console.log(responseGreetings);
+
                 if (detectedName === "Unknown") {
                   setModelResponse("Hai, siapa namamu?");
                   generateGreetings("Hai, siapa namamu?");
                 } else {
                   generateGreetings(responseGreetings);
                 }
-
                 console.log(detectedNames);
               }
             }

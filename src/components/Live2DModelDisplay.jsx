@@ -28,7 +28,7 @@ const Live2DModelDisplay = ({ modelRef, modelResponse, isLoading }) => {
     <div>
       <canvas
         id="canvas"
-        className="w-[100%] translate-y-[3.5rem] translate-x-20"
+        className="w-[100%] translate-y-[3rem] translate-x-20"
       ></canvas>
       {isLoading ? (
         <div className="absolute bottom-3 w-fit py-2 bg-white shadow text-bengkod px-3 rounded-xl text-sm mx-auto text-start">
