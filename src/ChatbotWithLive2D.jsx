@@ -296,15 +296,15 @@ const ChatbotWithLive2D = () => {
   }, [chatHistory]);
 
   return (
-    <div className="bg-indigo-200 w-full h-screen flex items-center justify-center font-sniglet">
-      <div className="bg-indigo-100 w-[1200px] h-[750px] rounded-3xl shadow p-4 relative flex">
+    <div className="flex items-center justify-center w-full h-screen bg-[url('background.svg')] font-sniglet">
+      <div className="bg-[#9CC6E9] w-[1200px] h-[750px] rounded-3xl shadow p-4 relative flex">
         <div className="flex flex-col w-5/6">
-          <div className="bg-[url('https://sozaino.site/wp-content/uploads/2024/07/okumono_animalb20.png')] bg-cover bg-center bg-no-repeat h-full mb-3 rounded-3xl p-4 relative border">
-            <Live2DModelDisplay
+          <div className="bg-[url('background-robot.gif')] bg-cover bg-center bg-no-repeat h-full mb-3 rounded-3xl p-4 relative border">
+            {/* <Live2DModelDisplay
               modelRef={modelRef}
               modelResponse={modelResponse}
               isLoading={isLoading}
-            />
+            /> */}
           </div>
 
           <div className="relative flex items-center">
@@ -336,7 +336,7 @@ const ChatbotWithLive2D = () => {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className={`size-8 rounded-full p-1 bg-indigo-100 text-bengkod ${
+                className={`size-8 rounded-full p-1 bg-[#f4f4f4] text-bengkod ${
                   !isLoading && !isAudioPlaying ? "opacity-100" : "opacity-50"
                 }`}
               >
@@ -366,7 +366,7 @@ const ChatbotWithLive2D = () => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="size-8 p-1"
+                  className="p-1 size-8"
                 >
                   <path
                     strokeLinecap="round"
@@ -380,18 +380,18 @@ const ChatbotWithLive2D = () => {
         </div>
 
         <div className="flex flex-col w-1/3 h-full ml-4">
-          <div className="bg-indigo-200 rounded-xl h-1/3 p-2 relative">
-            <div className="absolute top-2 left-2 text-white text-sm">
+          <div className="relative p-2 bg-blue-900 rounded-xl h-1/3">
+            <div className="absolute text-sm text-white top-2 left-2">
               {/* {detections.length > 0 ? detections[0].name : "webcam"} */}
               webcam📸
             </div>
-            <div className="bg-indigo-100 w-full h-5/6 rounded-xl mt-6">
+            <div className="w-full mt-6 bg-[#f4f4f4] h-5/6 rounded-xl">
               <div className="relative w-full h-full">
                 <video
                   ref={videoRef}
                   autoPlay
                   muted
-                  className="absolute w-full h-full object-cover rounded-xl"
+                  className="absolute object-cover w-full h-full rounded-xl"
                 />
                 <canvas ref={canvasRef} style={{ display: "none" }} />
                 {detections.map((det, index) => {
@@ -438,12 +438,12 @@ const ChatbotWithLive2D = () => {
             </div>
           </div>
 
-          <div className="bg-indigo-200 h-2/3 rounded-xl mt-4 p-2 relative">
-            <span className="absolute top-2 left-2 text-white text-sm">
+          <div className="relative p-2 mt-4 bg-blue-900 h-2/3 rounded-xl">
+            <span className="absolute text-sm text-white top-2 left-2">
               chat💬
             </span>
             <div
-              className="bg-indigo-100 w-full h-[91%] rounded-xl mt-6 p-2 overflow-y-auto no-scrollbar"
+              className="bg-white w-full h-[91%] rounded-xl mt-6 p-2 overflow-y-auto no-scrollbar"
               ref={chatContainerRef}
             >
               {chatHistory.map((chat, index) => (
@@ -451,15 +451,15 @@ const ChatbotWithLive2D = () => {
                   key={index}
                   className={`text-xs ${
                     chat.sender === "user"
-                      ? "text-bengkod bg-white rounded-br-none ml-auto"
-                      : "text-white bg-indigo-400 rounded-bl-none mr-auto"
+                      ? "text-white bg-[#9CC6E9] rounded-br-none ml-auto"
+                      : "text-white bg-blue-900 rounded-bl-none mr-auto"
                   } p-2 px-3 rounded-2xl w-fit mb-2 `}
                 >
                   {chat.message}
                 </div>
               ))}
               {interimTranscript && (
-                <div className="text-xs text-bengkod bg-white p-2 px-3 rounded-2xl w-fit mb-2 rounded-br-none ml-auto">
+                <div className="p-2 px-3 mb-2 ml-auto text-xs bg-white rounded-br-none text-bengkod rounded-2xl w-fit">
                   {interimTranscript}
                 </div>
               )}
