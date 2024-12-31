@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Live2DModelDisplay from "./components/Live2DModelDisplay";
+import Typewriter from "./components/Typewriter";
 
 //  SpeechRecognition (Web Speech API)
 const SpeechRecognition =
@@ -305,6 +306,21 @@ const ChatbotWithLive2D = () => {
               modelResponse={modelResponse}
               isLoading={isLoading}
             /> */}
+            {isLoading ? (
+              <div className="absolute bottom-3 w-fit py-2 bg-white shadow text-bengkod px-3 rounded-xl text-sm mx-auto text-start">
+                <div className="flex items-center space-x-1 h-4">
+                  <div className="h-1.5 w-1.5 bg-bengkod rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="h-1.5 w-1.5 bg-bengkod rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="h-1.5 w-1.5 bg-bengkod rounded-full animate-bounce"></div>
+                </div>
+              </div>
+            ) : (
+              modelResponse && (
+                <div className="absolute bottom-3 w-fit max-w-[90%] py-2 bg-white shadow text-bengkod px-3 rounded-xl text-sm mx-auto text-start rounded-tl-none">
+                  <Typewriter text={modelResponse} />
+                </div>
+              )
+            )}
           </div>
 
           <div className="relative flex items-center">
@@ -459,7 +475,7 @@ const ChatbotWithLive2D = () => {
                 </div>
               ))}
               {interimTranscript && (
-                <div className="p-2 px-3 mb-2 ml-auto text-xs bg-white rounded-br-none text-bengkod rounded-2xl w-fit">
+                <div className="p-2 px-3 mb-2 ml-auto text-xs bg-[#9CC6E9] rounded-br-none text-white rounded-2xl w-fit">
                   {interimTranscript}
                 </div>
               )}
