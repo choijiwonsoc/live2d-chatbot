@@ -298,7 +298,7 @@ const ChatbotWithLive2D = () => {
 
   return (
     <div className="flex items-center justify-center w-full h-screen bg-[url('background.svg')] font-sniglet">
-      <div className="bg-[#9CC6E9] w-[1200px] h-[750px] rounded-3xl shadow p-4 relative flex">
+      <div className="bg-blue-200 w-[1200px] h-[750px] rounded-3xl shadow p-4 relative flex">
         <div className="flex flex-col w-5/6">
           <div className="bg-[url('background-robot.gif')] bg-cover bg-center bg-no-repeat h-full mb-3 rounded-3xl p-4 relative border">
             {/* <Live2DModelDisplay
