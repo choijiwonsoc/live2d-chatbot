@@ -352,7 +352,7 @@ const ChatbotWithLive2D = () => {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className={`size-8 rounded-full p-1 bg-[#f4f4f4] text-bengkod ${
+                className={`size-8 rounded-full p-1 bg-blue-100 text-bengkod ${
                   !isLoading && !isAudioPlaying ? "opacity-100" : "opacity-50"
                 }`}
               >
@@ -467,7 +467,7 @@ const ChatbotWithLive2D = () => {
                   key={index}
                   className={`text-xs ${
                     chat.sender === "user"
-                      ? "text-white bg-[#9CC6E9] rounded-br-none ml-auto"
+                      ? "text-blue-900 bg-blue-200 rounded-br-none ml-auto"
                       : "text-white bg-blue-900 rounded-bl-none mr-auto"
                   } p-2 px-3 rounded-2xl w-fit mb-2 `}
                 >
