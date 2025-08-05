@@ -29,7 +29,7 @@ const ChatbotWithLive2D = () => {
         backgroundAlpha: 0,
       });
       const model = await Live2DModel.from(
-        "src/assets/catgirl/sixteenthes.model3.json",
+        "src/assets/Hiyori/Hiyori.model3.json",
         { autoInteract: false }
       );
 
@@ -110,16 +110,28 @@ const ChatbotWithLive2D = () => {
       const scaleFactor = 5.5;
       const mouthOpenY = Math.min((volume / 256) * scaleFactor, 1.0);
 
-      if (
-        modelRef.current &&
-        modelRef.current.internalModel &&
-        modelRef.current.internalModel.coreModel
-      ) {
-        modelRef.current.internalModel.coreModel.setParameterValueById(
-          "ParamMouthOpenY",
-          mouthOpenY
-        );
-      }
+      let elapsed = 0;
+      PIXI.Ticker.shared.add((delta) => {
+        if (
+          modelRef.current &&
+          modelRef.current.internalModel &&
+          modelRef.current.internalModel.coreModel
+        ) {
+          elapsed += delta / PIXI.Ticker.shared.FPS;
+
+          // Calculate oscillating value between 0 and 1 using sine wave
+          // Multiply elapsed time by speed factor (e.g., 2 * Math.PI * frequency)
+          const frequency = 1; // cycles per second (1 Hz = 1 open-close per second)
+          const oscillation = (Math.sin(2 * Math.PI * frequency * elapsed) + 1) / 2;
+
+          modelRef.current.internalModel.motionManager.stopAllMotions();
+          modelRef.current.internalModel.coreModel.setParameterValueById(
+            "ParamMouthOpenY",
+            oscillation
+          );
+        }
+      });
+
 
       if (!audio.paused) {
         requestAnimationFrame(animateLipSync);
@@ -135,41 +147,44 @@ const ChatbotWithLive2D = () => {
   };
 
   const sendMessage = async (message) => {
-    if (!message.trim()) return;
+    const sampleAudioBase64 = "UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YRAAAAAgAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAA==";
 
-    setChatHistory((prev) => [...prev, { sender: "user", message }]);
-    setIsLoading(true);
+    playAudioWithLipSync(sampleAudioBase64);
+    // if (!message.trim()) return;
 
-    try {
-      const { data } = await axios.post("http://127.0.0.1:8000/generate", {
-        text: message,
-      });
+    // setChatHistory((prev) => [...prev, { sender: "user", message }]);
+    // setIsLoading(true);
 
-      const botResponse = data.data.response;
-      const audioData = data.data.audio;
+    // try {
+    //   const { data } = await axios.post("http://127.0.0.1:8000/generate", {
+    //     text: message,
+    //   });
 
-      setChatHistory((prev) => [
-        ...prev,
-        { sender: "bot", message: botResponse },
-      ]);
+    //   const botResponse = data.data.response;
+    //   const audioData = data.data.audio;
 
-      setModelResponse(botResponse);
-      setIsLoading(false);
+    //   setChatHistory((prev) => [
+    //     ...prev,
+    //     { sender: "bot", message: botResponse },
+    //   ]);
 
-      if (audioData) {
-        playAudioWithLipSync(audioData);
-      } else {
-        setTimeout(() => setModelResponse(""), 3000);
-      }
-    } catch {
-      setChatHistory((prev) => [
-        ...prev,
-        { sender: "bot", message: "Maaf, terjadi kesalahan." },
-      ]);
-      setModelResponse("Maaf, terjadi kesalahan.");
-      setIsLoading(false);
-      setTimeout(() => setModelResponse(""), 5000);
-    }
+    //   setModelResponse(botResponse);
+    //   setIsLoading(false);
+
+    //   if (audioData) {
+    //     playAudioWithLipSync(audioData);
+    //   } else {
+    //     setTimeout(() => setModelResponse(""), 3000);
+    //   }
+    // } catch {
+    //   setChatHistory((prev) => [
+    //     ...prev,
+    //     { sender: "bot", message: "Maaf, terjadi kesalahan." },
+    //   ]);
+    //   setModelResponse("Maaf, terjadi kesalahan.");
+    //   setIsLoading(false);
+    //   setTimeout(() => setModelResponse(""), 5000);
+    // }
   };
 
   return (
@@ -273,15 +288,13 @@ const ChatbotWithLive2D = () => {
               {chatHistory.map((chat, index) => (
                 <div
                   key={index}
-                  className={`text-xs ${
-                    chat.sender === "user"
+                  className={`text-xs ${chat.sender === "user"
                       ? "text-bengkod bg-white"
                       : "text-white bg-indigo-400"
-                  } p-2 px-3 rounded-2xl w-fit mb-2 ${
-                    chat.sender === "user"
+                    } p-2 px-3 rounded-2xl w-fit mb-2 ${chat.sender === "user"
                       ? "rounded-br-none ml-auto"
                       : "rounded-bl-none mr-auto"
-                  }`}
+                    }`}
                 >
                   {chat.message}
                 </div>
