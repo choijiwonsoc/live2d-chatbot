@@ -29,19 +29,15 @@ const ChatbotWithLive2D = () => {
         backgroundAlpha: 0,
       });
       const model = await Live2DModel.from(
-        //"src/assets/catgirl/sixteenthes.model3.json",
-        "src/assets/Mark/Mark.model3.json",
-        { autoInteract: true }
+        "src/assets/catgirl/sixteenthes.model3.json",
+        { autoInteract: false }
       );
 
       model.scale.set(0.3);
       app.stage.addChild(model);
       modelRef.current = model;
-      console.log("Motion Groups:", model.internalModel.motionManager.motionGroups);
-      model.internalModel.motionManager.stopAllMotions();
     };
     loadLive2DModel();
-
   }, []);
 
   // Speech recognition configuration
@@ -113,25 +109,17 @@ const ChatbotWithLive2D = () => {
 
       const scaleFactor = 5.5;
       const mouthOpenY = Math.min((volume / 256) * scaleFactor, 1.0);
-      console.log("MODEL", modelRef.current);
-      console.log("MOTION", modelRef.current.internalModel.motionManager);
 
-      PIXI.Ticker.shared.add(() => {
-        if (
-          modelRef.current &&
-          modelRef.current.internalModel &&
-          modelRef.current.internalModel.coreModel && 
-          modelRef.current.internalModel.motionManager
-        ) {
-          modelRef.current.internalModel.motionManager.stopAllMotions();
-          console.log(modelRef.current.internalModel.motionManager);
-          modelRef.current.internalModel.coreModel.setParameterValueById(
-            "ParamMouthOpenY",
-            1.0 // Use float between 0.0 and 1.0
-          );
-        }
-      });
-      
+      if (
+        modelRef.current &&
+        modelRef.current.internalModel &&
+        modelRef.current.internalModel.coreModel
+      ) {
+        modelRef.current.internalModel.coreModel.setParameterValueById(
+          "ParamMouthOpenY",
+          mouthOpenY
+        );
+      }
 
       if (!audio.paused) {
         requestAnimationFrame(animateLipSync);
@@ -147,43 +135,41 @@ const ChatbotWithLive2D = () => {
   };
 
   const sendMessage = async (message) => {
-    const sampleAudioBase64 = "UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YRAAAAAgAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAB4AAAAeAAAAHgAAAA==";
-    playAudioWithLipSync(sampleAudioBase64);
-    // if (!message.trim()) return;
+    if (!message.trim()) return;
 
-    // setChatHistory((prev) => [...prev, { sender: "user", message }]);
-    // setIsLoading(true);
+    setChatHistory((prev) => [...prev, { sender: "user", message }]);
+    setIsLoading(true);
 
-    // try {
-    //   const { data } = await axios.post("http://127.0.0.1:8000/generate", {
-    //     text: message,
-    //   });
+    try {
+      const { data } = await axios.post("http://127.0.0.1:8000/generate", {
+        text: message,
+      });
 
-    //   const botResponse = data.data.response;
-    //   const audioData = data.data.audio;
+      const botResponse = data.data.response;
+      const audioData = data.data.audio;
 
-    //   setChatHistory((prev) => [
-    //     ...prev,
-    //     { sender: "bot", message: botResponse },
-    //   ]);
+      setChatHistory((prev) => [
+        ...prev,
+        { sender: "bot", message: botResponse },
+      ]);
 
-    //   setModelResponse(botResponse);
-    //   setIsLoading(false);
+      setModelResponse(botResponse);
+      setIsLoading(false);
 
-    //   if (audioData) {
-    //     playAudioWithLipSync(audioData);
-    //   } else {
-    //     setTimeout(() => setModelResponse(""), 3000);
-    //   }
-    // } catch {
-    //   setChatHistory((prev) => [
-    //     ...prev,
-    //     { sender: "bot", message: "Maaf, terjadi kesalahan." },
-    //   ]);
-    //   setModelResponse("Maaf, terjadi kesalahan.");
-    //   setIsLoading(false);
-    //   setTimeout(() => setModelResponse(""), 5000);
-    // }
+      if (audioData) {
+        playAudioWithLipSync(audioData);
+      } else {
+        setTimeout(() => setModelResponse(""), 3000);
+      }
+    } catch {
+      setChatHistory((prev) => [
+        ...prev,
+        { sender: "bot", message: "Maaf, terjadi kesalahan." },
+      ]);
+      setModelResponse("Maaf, terjadi kesalahan.");
+      setIsLoading(false);
+      setTimeout(() => setModelResponse(""), 5000);
+    }
   };
 
   return (
